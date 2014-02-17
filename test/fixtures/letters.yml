@@ -1,0 +1,21 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  url: MyString
+  seq_no: 
+  author: MyString
+  recipient: MyString
+  from_location: MyString
+  to_location: MyString
+  from_location_norm: MyString
+  to_location_norm: MyString
+
+two:
+  url: MyString
+  seq_no: 
+  author: MyString
+  recipient: MyString
+  from_location: MyString
+  to_location: MyString
+  from_location_norm: MyString
+  to_location_norm: MyString
