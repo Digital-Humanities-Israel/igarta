@@ -72,7 +72,7 @@ def parse_date(buf)
   dat = nil
   loc = nil
   n = buf.index(',')
-  unless n.nil?
+  unless n.nil? # TODO: add fallback for when the comma is missing -- just split by space and pick the first token as the location
     loc = to_plaintext(buf[0..n-1])
     dat = to_plaintext(buf[n+1..-1])
     dat = dat[0..-2] if dat[-1] == '.'
@@ -93,5 +93,5 @@ def parse_recipient(buf)
 end
 
 def to_plaintext(buf)
-  return strip_tags(buf.gsub('<![if !supportFootnotes]>','').gsub('<![endif]>','').gsub("\xa0",'')).strip_nikkud.strip
+  return strip_tags(buf.gsub('<![if !supportFootnotes]>','').gsub('<![endif]>','').gsub("\u00a0",'')).strip_nikkud.strip
 end
