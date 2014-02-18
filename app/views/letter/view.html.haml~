@@ -1,0 +1,47 @@
+%div{ :dir => 'rtl', :align => 'right'}
+  #container
+    .header
+      %img{ :src => '/assets/stamp.jpg' }
+      .search
+        %form{ :id => 'search-form'}
+          %input{ :type => 'text' }
+          %input{ :type => 'submit', :value => 'Search'}
+    .content
+      %h1= 'תצוגת מכתב'
+      %ul
+        %li{ :class => 'letter'}
+          .sender
+            %h2= 'מאת:'
+            / sender is hardcoded for this demo
+            %h3= 'אחד העם' 
+            %h4= 'ממקום: '+@item.from_location
+            %button{ :class=>'mapbtn', :type => 'button', :onclick => "alert('get map')"}
+              = 'זום על מיקום'
+            %img{:src => '/images/ehadhaam.jpg'}
+          .map
+            #map{ :style=> 'width: 800px; height: 400px;'}
+            / #map{ :style=> 'width: 800px; height: 400px;'}
+          .recipient
+            %h2= 'נמען'
+            %h3= @item.recipient
+            %h4= 'מקום: '+@item.to_location
+            %button{ :class => 'mapbtn', :type => 'button', :onclick => "alert('get map')"}
+              = 'זום על מיקום'
+          .letter_-meta
+            .additional-info
+              %ul
+                %li
+                  %h3= "תאריך כתיבה: #{@item.letter_date}"
+                  %b= "מלים בולטות: #{@item.topics}"
+
+:javascript
+  $(document).ready(function() {
+  handler = Gmaps.build('Google');
+  handler.buildMap({ provider: {}, internal: {id: 'map'}}, function(){
+    markers = handler.addMarkers(#{raw @markers.to_json});
+    handler.bounds.extendWith(markers);
+    handler.fitMapToBounds();
+    handler.getMap().setZoom(8);
+  });
+  }
+/  );

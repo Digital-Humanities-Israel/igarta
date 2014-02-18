@@ -1,4 +1,8 @@
 Thatcamp::Application.routes.draw do
+  get "letter/list"
+
+  match "letter/:id" => 'letter#view'
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

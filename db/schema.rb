@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140217205517) do
+ActiveRecord::Schema.define(:version => 20140218131511) do
 
   create_table "letters", :force => true do |t|
     t.string   "url"
@@ -26,6 +26,7 @@ ActiveRecord::Schema.define(:version => 20140217205517) do
     t.datetime "updated_at",         :null => false
     t.string   "letter_date"
     t.string   "plaintext_filename"
+    t.string   "topics"
   end
 
   create_table "locations", :force => true do |t|

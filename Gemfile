@@ -8,6 +8,9 @@ gem 'rails', '3.2.16'
 gem 'sqlite3'
 gem 'htmlentities'
 gem 'hebrew'
+gem 'will_paginate'
+gem 'haml'
+gem 'gmaps4rails'
 
 # Gems used only for assets and not required
 # in production environments by default.

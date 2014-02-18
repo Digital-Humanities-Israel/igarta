@@ -1,0 +1,22 @@
+%div{ :align => 'right', :dir => 'rtl' }
+  %h1= 'אגרות אחד העם'
+  %table
+    %tr
+      %th= '#'
+      %th= 'אל'
+      %th= 'בעיר'
+      %th= 'תאריך'
+      %th= 'מעיר'
+      %th= 'פעולות'
+    - for i in @items
+      %tr
+        %td= i.seq_no
+        %td= i.recipient
+        %td= i.to_location
+        %td= i.letter_date
+        %td= i.from_location
+        %td 
+          %a{ :href => '/letter/'+i.id.to_s}
+            = 'פרטים'
+
+= will_paginate @items

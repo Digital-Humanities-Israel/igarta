@@ -31,6 +31,23 @@ task :ingest, [:infile, :outdir] => :environment do |taskname, args|
     puts "please specify a filename to ingest\ne.g. rake ingest[/home/moose/ginzberg/letters_1898.html]"
   end
 end
+desc 'Ingest plaintext'
+task :ingest_split_plaintext => :environment do
+  puts "reading..."
+  Dir.foreach('split') {|f|
+    puts f
+    next if f[0] == '.'
+    year = f.scan /\d\d\d\d/
+    next if year.empty?
+    seqno = $'.scan /\d+/
+    buf = File.open('split/'+f,'r').read.lines
+    (recipient, to_location) = parse_recipient(buf[0])
+    (from_location, letter_date) = parse_date(buf[1])
+    from_location = 'אודסה' if from_location == 'אודיסא' # cheating, for demo purposes, since the normalization wasn't ready on time
+    letter = Letter.new(:url => 'TBD', :seq_no => seqno, :author => 'אחד העם', :recipient => recipient, :from_location => from_location, :to_location => to_location, :letter_date => letter_date, :plaintext_filename => '/home/abartov/dev/thatcamp/split/'+f)
+    letter.save!
+  }
+end
 def url_from_filename(f)
   n = f.rindex('/') # filename
   n = f[0..n-1].rindex('/') # BY author dir
@@ -39,18 +56,27 @@ def url_from_filename(f)
 end
 
 def split_letters(buf, outdir)
-  # modeling this primitive splitter on the structure of ginzberg/letters_1899
+  # modeling this primitive splitter on the structure of ginzberg/letters_1899; now added letters_1918
   chunks = buf.split('<p class=a9')
+  if chunks.size < 5
+    chunks = buf.split('<p class=ac')
+    puts "chunks.size = #{chunks.size}"
+  end
   letters = []
   chunks.shift # ignore first chunk, being the prologue
   seqno = 1
   chunks.each {|c|
     n = c.index('</p>') # first paragraph end mark end of recipient part
+    next unless c.any_hebrew? 
     recipient_part = '<p '+c[0..n-1].gsub(/\n/,' ').gsub(/\r/,' ') # restore opening tag, for strip_tags to work later
-    c = c[n+1..-1] # leave only the rest
-    n = c.index('</p>') # second paragraph end mark end of date part
-    date_part = '<p '+c[0..n-1].gsub(/\n/,' ').gsub(/\r/,' ')
-    letter_body = to_plaintext(c[n..-1].gsub(/\n/,' ').gsub(/\r/,' '))
+    next unless recipient_part.any_hebrew?
+    c = c[n+4..-1] # leave only the rest
+    n = c.index('/p>') # second paragraph end mark end of date part
+    
+    date_part = c[0..n-2].gsub(/\n/,' ').gsub(/\r/,' ')
+    puts "#{seqno} - date_part = #{date_part}" 
+    next unless (date_part.any_hebrew? && date_part !~ /תרגום\s*מ/)
+    letter_body = to_plaintext(c[n+3..-1].gsub(/\n/,' ').gsub(/\r/,' '))
     plaintext_body_filename = "#{outdir}/#{"%03d" % seqno}.txt"
 
     letters << { :seqno => seqno, :recipient_part => to_plaintext(recipient_part), :date_part => to_plaintext(date_part), :letter_body => letter_body, :plaintext_filename => plaintext_body_filename }
@@ -88,6 +114,7 @@ def parse_recipient(buf)
     loc = to_plaintext(buf[n+1..-1])
     loc = loc[0..-2] if loc[-1] == '.'
     rec = rec[1..-1] if rec[0] == 'ל' # skip the dative lamed
+    rec = rec[0..-2] if rec[-1] == ','
   end
   return [rec, loc] 
 end
